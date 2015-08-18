@@ -20,6 +20,9 @@ func Run() {
 	mux.HandleFunc("/healthcheck", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "OK")
 	})
+	app := Application{}
+
+	mux.HandleFunc("/api/transaction", app.TransactionHandler)
 
 	n := negroni.Classic()
 	n.UseHandler(mux)
