@@ -12,14 +12,13 @@ type Application struct{}
 func (a *Application) TransactionHandler(w http.ResponseWriter, req *http.Request) {
 	var decoder = json.NewDecoder(req.Body)
 	transaction := new(parser.Transaction)
-	err := decoder.Decode(&transaction)
-	if err != nil {
+	if err := decoder.Decode(&transaction); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	errValidation := transaction.IsValid()
-	if err != nil {
-		http.Error(w, errValidation.Error(), http.StatusInternalServerError)
+
+	if errValidation := transaction.IsValid(); errValidation != nil {
+		http.Error(w, errValidation.Error(), http.StatusBadRequest)
 		return
 	}
 }

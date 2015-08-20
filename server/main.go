@@ -9,19 +9,18 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Run() {
+func Start() {
 	viper.SetDefault("Port", 6680)
 	viper.SetEnvPrefix("newmotion")
 	viper.BindEnv("Port")
 
 	viper.SetConfigName("config")
 	viper.ReadInConfig()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthcheck", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "OK")
-	})
-	app := Application{}
 
+	app := Application{}
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/healthcheck", HealthCheckHandler)
 	mux.HandleFunc("/api/transaction", app.TransactionHandler)
 
 	n := negroni.Classic()
@@ -34,4 +33,9 @@ func Run() {
 
 	address := fmt.Sprintf(":%s", port)
 	n.Run(address)
+}
+
+func HealthCheckHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "OK")
+	w.WriteHeader(http.StatusOK)
 }
