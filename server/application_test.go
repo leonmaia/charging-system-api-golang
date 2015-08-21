@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+
+	"github.com/leonmaia/newmotion-golang/keydb"
 
 	. "gopkg.in/check.v1"
 )
@@ -17,10 +20,11 @@ func (s *TestSuite) TestTransactionHandler(c *C) {
 
 	response := httptest.NewRecorder()
 
-	app := &Application{}
+	db := keydb.NewDB()
+	app := &Application{DB: db}
 	app.TransactionHandler(response, req)
 
-	c.Assert(response.Code, Equals, http.StatusOK)
+	c.Assert(response.Code, Equals, http.StatusCreated)
 }
 
 func (s *TestSuite) TestTransactionHandlerJsonWithError(c *C) {
@@ -47,8 +51,19 @@ func (s *TestSuite) TestTransactionHandlerWithInvalidBody(c *C) {
 
 	response := httptest.NewRecorder()
 
-	app := &Application{}
+	db := keydb.NewDB()
+	app := &Application{DB: db}
 	app.TransactionHandler(response, req)
 
 	c.Assert(response.Code, Equals, http.StatusInternalServerError)
+}
+
+func (s *TestSuite) TestOverviewHander(c *C) {
+	req, _ := http.NewRequest("GET", "/api/overview", strings.NewReader(""))
+	response := httptest.NewRecorder()
+
+	app := &Application{}
+	app.OverviewHandler(response, req)
+
+	c.Assert(response.Code, Equals, http.StatusOK)
 }

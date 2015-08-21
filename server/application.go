@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/leonmaia/newmotion-golang/keydb"
 	"github.com/leonmaia/newmotion-golang/parser"
 )
 
-type Application struct{}
+type Application struct {
+	DB *keydb.DB
+}
 
 func (a *Application) TransactionHandler(w http.ResponseWriter, req *http.Request) {
 	var decoder = json.NewDecoder(req.Body)
@@ -21,4 +24,11 @@ func (a *Application) TransactionHandler(w http.ResponseWriter, req *http.Reques
 		http.Error(w, errValidation.Error(), http.StatusBadRequest)
 		return
 	}
+
+	a.DB.Set(transaction.CustomerID, transaction)
+	w.WriteHeader(http.StatusCreated)
+}
+
+func (a *Application) OverviewHandler(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
