@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/negroni"
+	"github.com/leonmaia/newmotion-golang/keydb"
 	"github.com/spf13/viper"
 )
 
@@ -17,11 +18,14 @@ func Start() {
 	viper.SetConfigName("config")
 	viper.ReadInConfig()
 
-	app := Application{}
+	db := keydb.NewDB()
+	app := Application{DB: db}
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/healthcheck", HealthCheckHandler)
 	mux.HandleFunc("/api/transaction", app.TransactionHandler)
+	mux.HandleFunc("/api/overview", app.OverviewHandler)
 
 	n := negroni.Classic()
 	n.UseHandler(mux)

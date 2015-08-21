@@ -1,8 +1,6 @@
 package keydb
 
-import (
-	. "gopkg.in/check.v1"
-)
+import . "gopkg.in/check.v1"
 
 func (s *TestSuite) TestSet(c *C) {
 	d := NewDB()
@@ -42,4 +40,17 @@ func (s *TestSuite) TestGetNotExist(c *C) {
 	_, exist := d.Get("testKey")
 
 	c.Assert(exist, Equals, false)
+}
+
+func (s *TestSuite) TestScan(c *C) {
+	d := NewDB()
+	v := `{"name": "value1"}`
+	v2 := `{"name": "value2"}`
+	v3 := `{"name": "value3"}`
+	d.Set("test1Key", v)
+	d.Set("test2Key", v2)
+	d.Set("test3Key", v3)
+
+	l := d.Scan("test")
+	c.Assert(len(l), Equals, 3)
 }
